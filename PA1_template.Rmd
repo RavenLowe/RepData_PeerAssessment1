@@ -77,7 +77,7 @@ median(sum_day$x)
 
 Let's see all the above findings in a histogram.
 
-``` {r histogram, fig.height=4}
+``` {r histogram, fig.height=6}
 hist(sum_day$x, breaks=10, main="Number of steps taken per day across Oct and Nov",
      xlab="Number of steps per day")
 abline(v=mean(sum_day$x), lwd = 3, col = 'blue')
@@ -101,7 +101,7 @@ colnames(avg_interval) <- c("interval", "avg_steps")
 max <- avg_interval[which.max(avg_interval$avg_steps), ]
 ```
 
-``` {r time_series_plot, fig.height=4}
+``` {r time_series_plot, fig.height=6}
 # make a time series plot (i.e. type = "1")
 with(avg_interval, plot(interval, avg_steps, type="l", xlab="5-minute interval across a day from midnight 0 to 2355", ylab="Average number of steps", main="Average number of steps by 5-minute interval"))
 with(avg_interval, points(x=max[,1], y=max[,2], pch=19, col="red"))
@@ -164,7 +164,7 @@ median(sum_day_patched$x)
 
 Let's see all the new findings in a histogram.
 
-``` {r histogram_patched, fig.height=4}
+``` {r histogram_patched, fig.height=6}
 hist(sum_day_patched$x, breaks=10, main="Number of steps taken per day across Oct and Nov", 
      xlab="Number of steps per day")
 abline(v=mean(sum_day_patched$x), lwd = 8, col = 'blue')
@@ -196,7 +196,7 @@ colnames(avg_interval_patched) <- c("interval", "day_type", "avg_steps")
 
 Make a panel plot showing the time series
 
-``` {r time_series_patched, fig.height=4}
+``` {r time_series_patched, fig.height=6}
 library(lattice)
 xyplot(avg_steps ~ interval | day_type, data = avg_interval_patched, type="l", layout = c(1, 2), xlab="5-minute interval across a day from midnight 0 to 2355", ylab="Average number of steps", main="Average number of steps across all weekdays or weekends")
 ```
