@@ -1,4 +1,9 @@
-# Reproducible Research: Peer Assessment 1
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document:
+    keep_md: true
+---
 
 ## Introduction
 
@@ -77,7 +82,7 @@ legend('topright', lty = 1, lwd = 3, col = c("blue", "red"),
        legend = c(paste("Mean = ", round(mean(sum_day$x))), paste("Median = ", round(median(sum_day$x)))))
 ```
 
-![](PA1_template_files/figure-html/histogram-1.png) 
+![plot of chunk histogram](figure/histogram-1.png) 
 
 
 
@@ -103,7 +108,7 @@ with(avg_interval, points(x=max[,1], y=max[,2], pch=19, col="red"))
 mtext(paste("Maximum of", round(max[,2]), "steps at", max[,1], "th time interval"))
 ```
 
-![](PA1_template_files/figure-html/time_series_plot-1.png) 
+![plot of chunk time_series_plot](figure/time_series_plot-1.png) 
  
 
 
@@ -184,7 +189,7 @@ legend('topright', lty = 1, lwd = 3, col = c("blue", "red"),
        legend = c(paste("Mean = ", round(mean(sum_day_patched$x))), paste("Median = ", round(median(sum_day_patched$x)))))
 ```
 
-![](PA1_template_files/figure-html/histogram_patched-1.png) 
+![plot of chunk histogram_patched](figure/histogram_patched-1.png) 
 
 Both mean and median increase as compared to the earlier estimates, which ignored missing data.  As the current dataset replaces the missing values by the average, it makes sense that the median value moves close to the mean value.
 
@@ -216,7 +221,7 @@ library(lattice)
 xyplot(avg_steps ~ interval | day_type, data = avg_interval_patched, type="l", layout = c(1, 2), xlab="5-minute interval across a day from midnight 0 to 2355", ylab="Average number of steps", main="Average number of steps across all weekdays or weekends")
 ```
 
-![](PA1_template_files/figure-html/time_series_patched-1.png) 
+![plot of chunk time_series_patched](figure/time_series_patched-1.png) 
 
 From the plot above, it is seen that the activities of weekdays are more concentrated in the morning hours, while the activities are more spread out across the day during weekends.
 
