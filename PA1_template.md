@@ -1,52 +1,31 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 ## Introduction
 
 This document contains a report to analyze the data collected from a personal movement monitoring device.  This device collects data at 5 minute intervals through out the day. The data consists of two months of data from an anonymous individual collected during the months of October and November, 2012 and include the number of steps taken in 5 minute intervals each day.
 
-```{r setoptions, echo=FALSE}
-# set the global options per instruction to present all the code chunks
-library(knitr)
-opts_chunk$set(echo=TRUE)
-```
+
 
 ## Loading and preprocessing the data
 
 
 1. Download the data from course web site, then unzip and load the data file
 
-```{r load_data}
+
+```r
 dat <- read.csv("activity.csv", header = TRUE)
 ```
 
-```{r look_data1, echo=FALSE, results="hide"}
-# look at the dataset
-str(dat)
-# 'data.frame':        17568 obs. of  3 variables:
-# $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
-# $ date    : Factor w/ 61 levels "2012-10-01","2012-10-02",..: 1 1 1 1 1 1 ...
-# $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
-```
+
 
 2. transform the date variable into date class to prepare for further analysis
 
-```{r transform_date}
+
+```r
 dat <- transform(dat, date = as.Date(date))
 ```
 
-```{r look_data2, echo=FALSE, results="hide"}
-# look at the processed dataset
-str(dat)
-# 'data.frame':        17568 obs. of  3 variables:
-# $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
-# $ date    : Date, format: "2012-10-01" "2012-10-01" "2012-10-01" ...
-# $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
-```
+
 
 The variables included in this dataset are:
 
@@ -59,25 +38,37 @@ The variables included in this dataset are:
 
 First, let's look at the dataset cut by day, studying the total number of steps taken per day
 
-``` {r steps_per_day}
+
+```r
 sum_day <- aggregate(dat$steps, by=list(dat$date), FUN=sum, na.rm=TRUE)
 ```
 
 Further calculate the mean of the total number of steps taken per day
 
-``` {r mean_steps_per_day}
+
+```r
 mean(sum_day$x)
+```
+
+```
+## [1] 9354.23
 ```
 
 And also the median of the total number of steps taken per day
 
-``` {r median_steps_per_day}
+
+```r
 median(sum_day$x)
+```
+
+```
+## [1] 10395
 ```
 
 Let's see all the above findings in a histogram.
 
-``` {r histogram, fig.height=4}
+
+```r
 hist(sum_day$x, breaks=10, main="Number of steps taken per day across Oct and Nov",
      xlab="Number of steps per day")
 abline(v=mean(sum_day$x), lwd = 3, col = 'blue')
@@ -86,13 +77,16 @@ legend('topright', lty = 1, lwd = 3, col = c("blue", "red"),
        legend = c(paste("Mean = ", round(mean(sum_day$x))), paste("Median = ", round(median(sum_day$x)))))
 ```
 
+![](PA1_template_files/figure-html/histogram-1.png) 
+
 
 
 ## What is the average daily activity pattern?
 
 Next switch over to see the data cut by 5-minute interval averaged across all days
 
-``` {r avg_interval}
+
+```r
 # calculate the average number of steps taken grouped by 5-min interval
 avg_interval <- aggregate(dat$steps, by=list(dat$interval), FUN=mean, na.rm=TRUE)
 colnames(avg_interval) <- c("interval", "avg_steps")
@@ -101,12 +95,15 @@ colnames(avg_interval) <- c("interval", "avg_steps")
 max <- avg_interval[which.max(avg_interval$avg_steps), ]
 ```
 
-``` {r time_series_plot, fig.height=4}
+
+```r
 # make a time series plot (i.e. type = "1")
 with(avg_interval, plot(interval, avg_steps, type="l", xlab="5-minute interval across a day from midnight 0 to 2355", ylab="Average number of steps", main="Average number of steps by 5-minute interval"))
 with(avg_interval, points(x=max[,1], y=max[,2], pch=19, col="red"))
 mtext(paste("Maximum of", round(max[,2]), "steps at", max[,1], "th time interval"))
 ```
+
+![](PA1_template_files/figure-html/time_series_plot-1.png) 
  
 
 
@@ -114,22 +111,24 @@ mtext(paste("Maximum of", round(max[,2]), "steps at", max[,1], "th time interval
 
 1. Missing values are a common problem with "quantified self" movement data and so we check to see what proportion of the observations are missing (i.e. coded as NA).
 
-``` {r check_NA}
+
+```r
 # calculate the number of the missing value records
 sum(is.na(dat$steps))
 ```
 
-```{r check_NA_%, echo=FALSE, results="hide"}
-# calculate the percentage of missing value recrods in dataset
-mean(is.na(dat$steps))
-# [1] 0.1311475
 ```
+## [1] 2304
+```
+
+
 
 2. According to the time series plot above, the average number of steps drops close to zero from the interval 0 to 500 (i.e. midnight to 5 am), which are the sleeping hours.  Therefore it is more sensible to fill the missing values with the mean for that 5-minute interval, which was calculated earlier.
 
 3. Let's create a new dataset with missing data being replaced by the average for that 5-minute interval
 
-``` {r patch_data}
+
+```r
 # add the 5-min interval average data calculated earlier to the original dataset based on the mutual varaible "interval"
 dat_patched <- merge(dat, avg_interval, by="interval")
 
@@ -145,26 +144,38 @@ dat_patched$steps_patched[steps.na] <- dat_patched$avg_steps[steps.na]
 
 4. Now redo the earlier analysis on the total number of steps per day but using the new dataset with missing data being imputed
 
-``` {r steps_per_day_patched}
+
+```r
 # calculate the total number of steps taken per day
 sum_day_patched <- aggregate(dat_patched$steps_patched, by=list(dat_patched$date), FUN=sum, na.rm=TRUE)
 ```
 
 Calculate the mean of the total steps taken per day
 
-``` {r mean_steps_per_day_patched}
+
+```r
 mean(sum_day_patched$x)
+```
+
+```
+## [1] 10766.19
 ```
 
 Next calculate the median of the total steps taken per day
 
-``` {r median_steps_per_day_patched}
+
+```r
 median(sum_day_patched$x)
+```
+
+```
+## [1] 10766.19
 ```
 
 Let's see all the new findings in a histogram.
 
-``` {r histogram_patched, fig.height=4}
+
+```r
 hist(sum_day_patched$x, breaks=10, main="Number of steps taken per day across Oct and Nov", 
      xlab="Number of steps per day")
 abline(v=mean(sum_day_patched$x), lwd = 8, col = 'blue')
@@ -172,6 +183,8 @@ abline(v=median(sum_day_patched$x), lwd = 3, col = 'red')
 legend('topright', lty = 1, lwd = 3, col = c("blue", "red"), 
        legend = c(paste("Mean = ", round(mean(sum_day_patched$x))), paste("Median = ", round(median(sum_day_patched$x)))))
 ```
+
+![](PA1_template_files/figure-html/histogram_patched-1.png) 
 
 Both mean and median increase as compared to the earlier estimates, which ignored missing data.  As the current dataset replaces the missing values by the average, it makes sense that the median value moves close to the mean value.
 
@@ -181,7 +194,8 @@ Both mean and median increase as compared to the earlier estimates, which ignore
 
 Go back to the view cut by 5-minute interval but further drill down to observe any differences in activity patterns between weekdays and weekends
 
-``` {r days_of_week}
+
+```r
 # add a new variable, day, in the patched dataset, indicating days of the week
 dat_patched$day <- weekdays(dat_patched$date, abb=TRUE)
 
@@ -196,10 +210,13 @@ colnames(avg_interval_patched) <- c("interval", "day_type", "avg_steps")
 
 Make a panel plot showing the time series
 
-``` {r time_series_patched, fig.height=4}
+
+```r
 library(lattice)
 xyplot(avg_steps ~ interval | day_type, data = avg_interval_patched, type="l", layout = c(1, 2), xlab="5-minute interval across a day from midnight 0 to 2355", ylab="Average number of steps", main="Average number of steps across all weekdays or weekends")
 ```
+
+![](PA1_template_files/figure-html/time_series_patched-1.png) 
 
 From the plot above, it is seen that the activities of weekdays are more concentrated in the morning hours, while the activities are more spread out across the day during weekends.
 
